@@ -1,0 +1,24 @@
+{
+  "name": "expandables-js",
+  "version": "1.0.0",
+  "description": "Plugin for creating and managing collapsible content areas like F.A.Q's and dropdowns",
+  "main": "expandables.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jvuzzell/expandables-js.git"
+  },
+  "keywords": [
+    "dropdown",
+    "collapse",
+    "expand"
+  ],
+  "author": "Joshua Uzzell <josh.uzzell@gmail.com> (https://uzzell.cc)",
+  "license": "SEE LICENSE IN license.txt",
+  "bugs": {
+    "url": "https://github.com/jvuzzell/expandables-js/issues"
+  },
+  "homepage": "https://github.com/jvuzzell/expandables-js#readme"
+}
