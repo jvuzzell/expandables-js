@@ -9,22 +9,16 @@ export let Expandables = (function() {
 
         // Private
         var expand = function( target ) {
-            var targetHeight = target.scrollHeight;
+            let targetHeight = target.scrollHeight;
             publicMethods.updateState( { 'expanded' : true } );
-
             target.style.height = targetHeight + 'px';
-            target.addEventListener('transitionend', function(e) {
-                target.removeEventListener('transitionend', arguments.callee);
-
-                target.style.height = null;
-            });
         }
 
         var collapse = function( target ) {
-            var targetHeight = target.scrollHeight;
+            let targetHeight = target.scrollHeight;
             publicMethods.updateState( { 'expanded' : false } );
 
-            var targetTransition = target.style.transition;
+            let targetTransition = target.style.transition;
             target.style.transition = '';
 
             requestAnimationFrame( function() {
@@ -38,11 +32,11 @@ export let Expandables = (function() {
         }
 
         var collapseSiblings = function( targetGroup ) {
-            var prevTargetContainer = targetGroup.querySelector( '[data-expandable-container="expanded"]' );
+            let prevTargetContainer = targetGroup.querySelector( '[data-expandable-container="expanded"]' );
 
             if ( prevTargetContainer == null ) return;
 
-            var prevTarget = prevTargetContainer.querySelector( '[data-expandable-target]' );
+            let prevTarget = prevTargetContainer.querySelector( '[data-expandable-target]' );
 
             collapse( prevTarget );
             prevTargetContainer.setAttribute( 'data-expandable-container', 'collapsed' ); 
@@ -56,38 +50,40 @@ export let Expandables = (function() {
                 expand( settings.target );
                 settings.container.setAttribute( 'data-expandable-container', 'expanded' ); 
             } else {
-                collapse( settings.target );
+                collapse( settings.target ); 
                 settings.container.setAttribute( 'data-expandable-container', 'collapsed' );
             }        
         }
                 
         publicMethods.init = function( options ) {
-            
+
+            if( store[ options.id ] !== undefined ) return;
+
             settings = options; // This makes arguments available in the scope of other methods within this object
 
-            if( settings == null || settings == undefined ) { console.error( 'Flyout Plugin, settings not provided upon initialization' ); return; } 
+            if( settings == null || settings == undefined ) { console.error( 'Expandables Plugin, settings not provided upon initialization' ); return; } 
 
-            var trigger      = settings.trigger;
-            var triggerEvent = 'click'; 
+            let trigger      = settings.trigger;
+            let triggerEvent = 'click'; 
 
             if( settings.override === 'true' ) {
 
                 try {
                     window.addEventListener( triggerEvent, function( event ) {
                         if( event.target == trigger ) {
-                            thisExpandableSettings = Expandable.getFlyout( settings.id ).getSettings(); 
+                            thisExpandableSettings = Expandables.getExpandables( settings.id ).getSettings(); 
                             window[ thisExpandableSettings.customCallback ]( event );
                         }
                     });                 
                 } catch( error ) {
-                    console.error( 'Expandable Plugin, setting ' + settings.id + ' expandable custom callback failed: ' + error.message );
+                    console.error( 'Expandables Plugin, setting ' + settings.id + ' expandable custom callback failed: ' + error.message );
                 }
 
             } else {
 
                 window.addEventListener( triggerEvent, function( event ) {
                     if( event.target == trigger ) {
-                        Expandable.getExpandable( settings.id ).toggle();
+                        Expandables.getExpandable( settings.id ).toggle();
                     }
                 }); 
 
@@ -101,7 +97,7 @@ export let Expandables = (function() {
 
         publicMethods.updateState = function( state ) {
             
-            for( var setting in state ) {
+            for( let setting in state ) {
                 settings[ setting ] = state[ setting ];
             }
 
@@ -123,6 +119,7 @@ export let Expandables = (function() {
     }
 
     var setExpandable = function( name, obj ) {
+        if( store[ name ] !== undefined ) return;
         store[ name ] = obj;
     }
 
@@ -151,18 +148,18 @@ export let Expandables = (function() {
         var expandableOverride = expandable.getAttribute( 'data-expandable-override' );
         
         if( expandableOverride ) {
-            callbackName = expandable.getAttribute( 'data-flyout-callback' ); 
+            callbackName = expandable.getAttribute( 'data-expandable-callback' ); 
             expandableCallback = ( callbackName == undefined ) ? null : callbackName; // string, name of function to call
             if( expandableCallback == null ) { console.warn( 'Expandables Plugin did not detect custom callback for override, Node:', expandable ); }
         }
     
         if( expandableTarget == null ) { console.warn( 'Expandables Plugin did not detect target, Node:', expandable ); }
-        if( expandableTrigger == null ) { console.warn( 'Expandables Plugin did not detect trigger, Node:', expandable) ; }
+        if( expandableTrigger == null ) { console.warn( 'Expandables Plugin did not detect trigger, Node:', expandable ) ; }
     
         // As you instantiate new Expandables, insert them in the expandableStore object, indexed by the name of the expandable.
         this.storeExpandable( 
             expandableName,
-            new Expandable.build({
+            new Expandables.build({
                 id               : expandableName,
                 container        : expandable, 
                 trigger          : expandableTrigger, 
@@ -173,7 +170,7 @@ export let Expandables = (function() {
                 expanded         : isExpanded
             })
         );  
-    
+            
         function findAncestor(el, sel) {
             while ((el = el.parentElement) && !((el.matches || el.matchesSelector).call(el,sel)));
             return el;
@@ -185,6 +182,7 @@ export let Expandables = (function() {
         build              : Constructor, 
         registerExpandable : registerExpandable, 
         storeExpandable    : setExpandable, 
+        getExpandables     : getExpandables, 
         getExpandable      : getExpandable
     };   
   
@@ -195,8 +193,8 @@ export var initExpandables = function() {
     var expandables = document.querySelectorAll( '[data-expandable-container]' );
     if( expandables == null ) return; 
 
-    for( var i = 0; i < expandables.length; i++ ) {
-        Expandable.registerExpandable( expandables[ i ], i );
+    for( let i = 0; i < expandables.length; i++ ) {
+        Expandables.registerExpandable( expandables[ i ], i );
     }
 
 }
