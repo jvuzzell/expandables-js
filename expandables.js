@@ -55,7 +55,7 @@ export let Expandables = (function() {
             }        
         }
                 
-        publicMethods.init = function( options ) {
+        publicMethods.init = async function( options ) {
 
             if( store[ options.id ] !== undefined ) return;
 
@@ -64,14 +64,17 @@ export let Expandables = (function() {
             if( settings == null || settings == undefined ) { console.error( 'Expandables Plugin, settings not provided upon initialization' ); return; } 
 
             let trigger      = settings.trigger;
-            let triggerEvent = 'click'; 
+            let triggerEvent = trigger.getAttribute( 'data-expandable-trigger' ); 
+
+            triggerEvent = ( triggerEvent !== undefined || triggerEvent=== '' ) ? triggerEvent : 'click'; 
+            await trigger.setAttribute( 'data-expandable-id', settings.id );
 
             if( settings.override === 'true' ) {
 
                 try {
                     window.addEventListener( triggerEvent, function( event ) {
-                        if( event.target == trigger ) {
-                            thisExpandableSettings = Expandables.getExpandables( settings.id ).getSettings(); 
+                        if( event.target === trigger ) {
+                            thisExpandableSettings = Expandables.getExpandable( settings.id ).getSettings(); 
                             window[ thisExpandableSettings.customCallback ]( event );
                         }
                     });                 
@@ -81,8 +84,8 @@ export let Expandables = (function() {
 
             } else {
 
-                window.addEventListener( triggerEvent, function( event ) {
-                    if( event.target == trigger ) {
+                window.addEventListener( triggerEvent, function( event ) { 
+                    if( event.target.getAttribute( 'data-expandable-id' ) === trigger.dataset.expandableId ) {
                         Expandables.getExpandable( settings.id ).toggle();
                     }
                 }); 
@@ -127,7 +130,7 @@ export let Expandables = (function() {
         return store[ name ];
     }
 	
-    var getExpandables = function( name ) {
+    var getExpandables = function() {
         return store;
     }	
 
