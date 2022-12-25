@@ -1,61 +1,62 @@
-export let Expandables = (function() {
+export let Expandables = (() => {
 
     let store = {};
   
     let Constructor = function( options ) {
 
-        var publicMethods = {};
-        var settings; 
+        let publicMethods = {};
+        let settings; 
 
         // Private
-        var expand = function( target ) {
+        const expand = ( target ) => {
             let targetHeight = target.scrollHeight;
             publicMethods.updateState( { 'expanded' : true } );
             target.style.height = targetHeight + 'px';
         }
 
-        var collapse = function( target ) {
+        const collapse = ( target ) => {
             let targetHeight = target.scrollHeight;
             publicMethods.updateState( { 'expanded' : false } );
 
             let targetTransition = target.style.transition;
             target.style.transition = '';
 
-            requestAnimationFrame( function() {
+            requestAnimationFrame(() => {
                 target.style.height = targetHeight + 'px';
                 target.style.transition = targetTransition;
 
-                requestAnimationFrame( function() {
+                requestAnimationFrame(() => {
                     target.style.height = 0 + 'px';
                 })
             });      
         }
 
-        var collapseSiblings = function( targetGroup ) {
-            let prevTargetContainer = targetGroup.querySelector( '[data-expandable-container="expanded"]' );
+        const collapseSiblings = ( targetGroup ) => {
+            let prevTargetContainers = targetGroup.querySelectorAll( '[data-expandable-container="expanded"]' );
+            if ( prevTargetContainers.length === 0 ) return;
 
-            if ( prevTargetContainer == null ) return;
+            for (let i = 0; i < prevTargetContainers.length; i++) {
+                let prevTarget = prevTargetContainers[i].querySelector( '[data-expandable-target]' );
 
-            let prevTarget = prevTargetContainer.querySelector( '[data-expandable-target]' );
-
-            collapse( prevTarget );
-            prevTargetContainer.setAttribute( 'data-expandable-container', 'collapsed' ); 
+                collapse( prevTarget );
+                prevTargetContainers[i].setAttribute( 'data-expandable-container', 'collapsed' ); 
+            }
         }
 
-        // Public functions
-
-        publicMethods.toggle = function toggle() {
+        // Public
+        publicMethods.toggle = () => {
             if( settings.container.getAttribute( 'data-expandable-container' ) == 'collapsed' ) {
-                if( settings.targetGroup != null ) collapseSiblings( settings.targetGroup );  
+                if( settings.targetGroup !== null ) collapseSiblings( settings.targetGroup );  
                 expand( settings.target );
                 settings.container.setAttribute( 'data-expandable-container', 'expanded' ); 
             } else {
+                if( settings.targetGroup !== null ) collapseSiblings( settings.targetGroup );  
                 collapse( settings.target ); 
                 settings.container.setAttribute( 'data-expandable-container', 'collapsed' );
             }        
         }
                 
-        publicMethods.init = async function( options ) {
+        publicMethods.init = async ( options ) => {
 
             if( store[ options.id ] !== undefined ) return;
 
@@ -66,29 +67,35 @@ export let Expandables = (function() {
             let trigger      = settings.trigger;
             let triggerEvent = trigger.getAttribute( 'data-expandable-trigger' ); 
 
-            triggerEvent = ( triggerEvent !== undefined || triggerEvent=== '' ) ? triggerEvent : 'click'; 
+            triggerEvent = ( triggerEvent !== undefined && triggerEvent !== '' ) ? triggerEvent : 'click'; 
+            settings.triggerEvent = triggerEvent;
+
             await trigger.setAttribute( 'data-expandable-id', settings.id );
 
             if( settings.override === 'true' ) {
 
                 try {
-                    window.addEventListener( triggerEvent, function( event ) {
-                        if( event.target === trigger ) {
-                            thisExpandableSettings = Expandables.getExpandable( settings.id ).getSettings(); 
+                    settings.callback = ( event ) => {
+                        if( event.target.getAttribute( 'data-expandable-id' ) === trigger.dataset.expandableId ) {  
+                            let thisExpandableSettings = Expandables.getExpandable( settings.id ).getSettings();  
                             window[ thisExpandableSettings.customCallback ]( event );
                         }
-                    });                 
+                    }; 
+
+                    window.addEventListener( triggerEvent, settings.callback );                 
                 } catch( error ) {
                     console.error( 'Expandables Plugin, setting ' + settings.id + ' expandable custom callback failed: ' + error.message );
                 }
 
             } else {
-
-                window.addEventListener( triggerEvent, function( event ) { 
+ 
+                settings.callback = ( event ) => {  
                     if( event.target.getAttribute( 'data-expandable-id' ) === trigger.dataset.expandableId ) {
                         Expandables.getExpandable( settings.id ).toggle();
                     }
-                }); 
+                } 
+
+                window.addEventListener( triggerEvent, settings.callback ); 
 
             }
 
@@ -98,7 +105,7 @@ export let Expandables = (function() {
             
         };
 
-        publicMethods.updateState = function( state ) {
+        publicMethods.updateState = ( state ) => {
             
             for( let setting in state ) {
                 settings[ setting ] = state[ setting ];
@@ -106,60 +113,63 @@ export let Expandables = (function() {
 
         }
         
-        publicMethods.getSettings = function() {
+        publicMethods.getSettings = () => {
             return settings;
         }
 
-        publicMethods.isExpanded = function() {
+        publicMethods.isExpanded = () => {
             return settings.expanded;
         }
 
         // Initialize plugin
         publicMethods.init( options );
-
         return publicMethods;
 
     }
 
-    var setExpandable = function( name, obj ) {
+    const setExpandable = ( name, obj ) => {
         if( store[ name ] !== undefined ) return;
         store[ name ] = obj;
     }
 
-    var getExpandable = function( name ) {
+    const getExpandable = ( name ) => {
         return store[ name ];
     }
 	
-    var getExpandables = function() {
+    const getExpandables = () => {
         return store;
     }	
 
-    var registerExpandable = function( expandable, iterator ) {
+    const destroyExpandables = () => { 
+        for( const expandableId in store ) {
+            let settings = getExpandable( expandableId ).getSettings(); 
+            let callbackName = settings.callback;  
+            let triggerEvent = settings.triggerEvent; 
+            window.removeEventListener( triggerEvent, callbackName );
+        }
+        store = {};
+    }
 
-        var expandableTarget   = expandable.querySelector( '[data-expandable-target]' );
-        var expandableName     = ( expandableTarget.getAttribute( 'data-expandable-target' ) !== '' ) ? expandableTarget.getAttribute( 'data-expandable-target' ) : 'expandable_' + iterator;
-        var expandableTrigger  = expandable.querySelector( '[data-expandable-trigger]' );
-        var expandableGroup    = findAncestor( expandable, '[data-expandable-group]' );
-        var isExpanded         = ( expandable.getAttribute( 'data-expandable-container' ) == 'collapsed' ) ? false : true;
-        var expandableCallback = null;
-        var callbackName;            
+    const registerExpandable = function( expandable, iterator ) {
+
+        let expandableTarget   = expandable.querySelector( '[data-expandable-target]' );
+        let expandableName     = ( expandableTarget.getAttribute( 'data-expandable-target' ) !== '' ) ? expandableTarget.getAttribute( 'data-expandable-target' ) : 'expandable_' + iterator;
+        let expandableTrigger  = expandable.querySelector( '[data-expandable-trigger]' );
+        let expandableGroup    = findAncestor( expandable, '[data-expandable-group]' );
+        let isExpanded         = ( expandable.getAttribute( 'data-expandable-container' ) == 'collapsed' ) ? false : true;
+        let expandableOverride = expandable.getAttribute( 'data-expandable-override' );
+        let expandableCallback = null;
+        let callbackName;             
     
-        // expandableCallback will be called if you set expandableOverride to 'true' (string val).
-        // The first (and only) argument to expandableCallback will be e (the click event).
-        // If you do this, you will need to open the expandable on your own. You will also need to obtain the field to update.
-        // See toggle() above for how to do this. Or, you could just call toggle() on your own and pass e along to it.
-        var expandableOverride = expandable.getAttribute( 'data-expandable-override' );
-        
-        if( expandableOverride ) {
-            callbackName = expandable.getAttribute( 'data-expandable-callback' ); 
-            expandableCallback = ( callbackName == undefined ) ? null : callbackName; // string, name of function to call
-            if( expandableCallback == null ) { console.warn( 'Expandables Plugin did not detect custom callback for override, Node:', expandable ); }
+        if( expandableOverride === "true" ) {
+            callbackName = expandable.getAttribute( 'data-expandable-callback' );  
+            expandableCallback = ( callbackName === undefined ) ? null : callbackName; // string, name of function to call
+            if( expandableCallback == null ) { console.warn( 'Expandables Plugin did not detect custom callback for override, Node:', expandable ); } 
         }
     
         if( expandableTarget == null ) { console.warn( 'Expandables Plugin did not detect target, Node:', expandable ); }
         if( expandableTrigger == null ) { console.warn( 'Expandables Plugin did not detect trigger, Node:', expandable ) ; }
     
-        // As you instantiate new Expandables, insert them in the expandableStore object, indexed by the name of the expandable.
         this.storeExpandable( 
             expandableName,
             new Expandables.build({
@@ -186,14 +196,15 @@ export let Expandables = (function() {
         registerExpandable : registerExpandable, 
         storeExpandable    : setExpandable, 
         getExpandables     : getExpandables, 
-        getExpandable      : getExpandable
+        getExpandable      : getExpandable, 
+        destroyExpandables : destroyExpandables
     };   
   
 })();
   
-export var initExpandables = function() {
+export const initExpandables = function() {
     
-    var expandables = document.querySelectorAll( '[data-expandable-container]' );
+    let expandables = document.querySelectorAll( '[data-expandable-container]' );
     if( expandables == null ) return; 
 
     for( let i = 0; i < expandables.length; i++ ) {
