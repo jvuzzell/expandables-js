@@ -1,11 +1,11 @@
 {
     "name": "expandables-js",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Plugin for creating and managing collapsible content areas like F.A.Q's and dropdowns",
     "main": "expandables.js",
     "scripts": {
-        "test": "jest", 
-        "test-watch" : "jest --watch"
+        "test": "jest",
+        "test-watch": "jest --watch"
     },
     "repository": {
         "type": "git",
