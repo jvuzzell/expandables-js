@@ -11,8 +11,8 @@ export let Expandables = (() => {
         const expand = ( target ) => {
             let targetHeight = target.scrollHeight;
             publicMethods.updateState( { 'expanded' : true } );
-            target.style.height = targetHeight + 'px';
-        }
+            target.style.height = targetHeight + 'px'; 
+        } 
 
         const collapse = ( target ) => {
             let targetHeight = target.scrollHeight;
@@ -21,12 +21,13 @@ export let Expandables = (() => {
             let targetTransition = target.style.transition;
             target.style.transition = '';
 
-            requestAnimationFrame(() => {
+            requestAnimationFrame(() => { 
                 target.style.height = targetHeight + 'px';
                 target.style.transition = targetTransition;
 
                 requestAnimationFrame(() => {
                     target.style.height = 0 + 'px';
+                    
                 })
             });      
         }
@@ -98,6 +99,12 @@ export let Expandables = (() => {
                 window.addEventListener( triggerEvent, settings.callback ); 
 
             }
+
+            settings.target.addEventListener( 'transitionend', event => {
+                if( settings.expanded === true ) { 
+                    settings.target.style.height = 'auto';
+                }
+            });
 
             if( !settings.expanded ) {
                 collapse( settings.target );
