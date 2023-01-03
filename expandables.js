@@ -27,7 +27,6 @@ export let Expandables = (() => {
 
                 requestAnimationFrame(() => {
                     target.style.height = 0 + 'px';
-                    
                 })
             });      
         }
@@ -99,12 +98,18 @@ export let Expandables = (() => {
                 window.addEventListener( triggerEvent, settings.callback ); 
 
             }
+             
+            if( settings.targetGroup === null ) {
 
-            settings.target.addEventListener( 'transitionend', event => {
-                if( settings.expanded === true ) { 
-                    settings.target.style.height = 'auto';
-                }
-            });
+                settings.target.addEventListener( 'transitionend', event => {    
+ 
+                    if( settings.expanded === true  ) { 
+                        settings.target.style.height = 'auto';
+                    }
+                    
+                });
+
+            }
 
             if( !settings.expanded ) {
                 collapse( settings.target );
