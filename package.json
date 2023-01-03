@@ -1,6 +1,6 @@
 {
     "name": "expandables-js",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "description": "Plugin for creating and managing collapsible content areas like F.A.Q's and dropdowns",
     "main": "expandables.js",
     "scripts": {
