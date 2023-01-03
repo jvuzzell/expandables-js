@@ -4,6 +4,10 @@
     height: auto;
 }
 
+[data-expandable-container=collapsed] [data-expandable-target] { 
+    height : 0;
+}
+
 [data-expandable-container] [data-expandable-trigger] {
     transition: all 25ms ease-out;
     transform: rotate(0);
@@ -11,7 +15,8 @@
 
 [data-expandable-container="expanded"] [data-expandable-trigger] {
     transform: rotate(90deg);
-}
+} 
+
 
 /* media-quries */
 @media (max-width: 639.98px) {
@@ -29,3 +34,5 @@
         white-space: nowrap;
     }
 }
+
+

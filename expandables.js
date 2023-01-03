@@ -111,10 +111,6 @@ export let Expandables = (() => {
 
             }
 
-            if( !settings.expanded ) {
-                collapse( settings.target );
-            }
-            
         };
 
         publicMethods.updateState = ( state ) => {
