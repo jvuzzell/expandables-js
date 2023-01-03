@@ -55,7 +55,14 @@ export let Expandables = (() => {
                 settings.container.setAttribute( 'data-expandable-container', 'collapsed' );
             }        
         }
-                
+        
+        publicMethods.collapse = () => {
+
+            collapse( settings.target ); 
+            settings.container.setAttribute( 'data-expandable-container', 'collapsed' );
+
+        }
+
         publicMethods.init = async ( options ) => {
 
             if( store[ options.id ] !== undefined ) return;
@@ -135,6 +142,25 @@ export let Expandables = (() => {
 
     }
 
+    const collapseAll = ( containerSelector = 'body' ) => { 
+         
+        let expandables = Expandables.getExpandables(); 
+        
+        for( let key in expandables ) {
+
+            const expandable = expandables[ key ];
+            const expandableSettings = expandables[ key ].getSettings();
+
+            if( expandable.getSettings().targetGroup !== null ) { return; }
+            let trigger = document.querySelector( containerSelector ).querySelector( "[data-expandable-id='" + expandableSettings.id + "']" ); 
+
+            if( trigger === undefined ) { return; }
+            if( expandableSettings.expanded ) { expandable.collapse(); }
+           
+        }
+
+    }
+
     const setExpandable = ( name, obj ) => {
         if( store[ name ] !== undefined ) return;
         store[ name ] = obj;
@@ -205,7 +231,8 @@ export let Expandables = (() => {
         storeExpandable    : setExpandable, 
         getExpandables     : getExpandables, 
         getExpandable      : getExpandable, 
-        destroyExpandables : destroyExpandables
+        destroyExpandables : destroyExpandables, 
+        collapseAll        : collapseAll
     };   
   
 })();
