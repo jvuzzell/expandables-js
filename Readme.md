@@ -4,20 +4,13 @@ A plugin for creating and managing collapsible content areas like F.A.Qs.
 
 <br>
 
-# Expandables-js
-
-Offers methods for posting UI alerts.
-Plugin for creating and managing collapsible content areas like F.A.Q's
-
-<br>
-
 **Table of contents** 
 - [Installation](#installation)
 - Examples
     - [Basic Usage](#basic-usage)
-    - Accordion Group 
+    - [Accordion Group](#accordion-group)
     - [Custom Trigger Events](#trigger-events)
-    - [Custom Callbacks](#)
+    - [Custom Callbacks](#custom-callback)
 - [Public Methods](#public-methods) 
     - Expandables - Class
         - .collapseAll()
@@ -101,7 +94,7 @@ See [*'/demo/basic-usage.html'*](https://github.com/jvuzzell/expandables-js/tree
 ---
 
 ## Accordion Group
-See [*'/demo/basic-usage.html'*](https://github.com/jvuzzell/expandables-js/tree/main/demo) in repo for complete example
+See [*'/demo/accordion-group.html'*](https://github.com/jvuzzell/expandables-js/tree/main/demo) in repo for complete example
 
 <br>
 
