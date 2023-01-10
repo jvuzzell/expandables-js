@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expandables Test</title>  
+    <link rel="stylesheet" href="/expandables-js/expandables.css">
+</head>
+<body>
+    <div data-expandable-group>
+        <div data-expandable-container="collapsed">
+            <h2>Expandable Plugin (Group)</h2>
+            <button data-expandable-trigger type="button">></button>
+            <div data-expandable-target>
+                <p>This is a sample Expandable component. Click the caret icon to trigger expansion or collapse.</p>
+                <p>The expandable container has two states: "expanded" and "collapsed"</p>
+            </div>
+        </div>
+        <div data-expandable-container="expanded">
+            <h2>Expandable Plugin (Group)</h2>
+            <button data-expandable-trigger type="button">></button>
+            <div data-expandable-target>
+                <p>This is a sample Expandable component. Click the caret icon to trigger expansion or collapse.</p>
+                <p>The expandable container has two states: "expanded" and "collapsed"</p>
+            </div>
+        </div>
+        <div data-expandable-container="collapsed">
+            <h2>Expandable Plugin (Group)</h2>
+            <button data-expandable-trigger type="button">></button>
+            <div data-expandable-target>
+                <p>This is a sample Expandable component. Click the caret icon to trigger expansion or collapse.</p>
+                <p>The expandable container has two states: "expanded" and "collapsed"</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import {Expandables, initExpandables} from '/expandables-js/expandables.js';
+        initExpandables(); 
+    </script>
+</body>
+</html>

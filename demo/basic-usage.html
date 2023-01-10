@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expandables Test</title>  
+    <link rel="stylesheet" href="/expandables-js/expandables.css">
+</head>
+<body>
+    <button id="collapseExpandables">Collapse</button>
+    <button id="expandExpandables">Expand</button>
+    <button id="deleteExpandables">Delete</button>
+    <br><br>
+    <div data-expandable-container="collapsed">
+        <button data-expandable-trigger="">></button>
+        <h2>Expandable Plugin</h2>
+        <div data-expandable-target>
+            <p>This is a sample Expandable component. Click the caret icon to trigger expansion or collapse.</p>
+            <p>The expandable container has two states: "expanded" and "collapsed"</p>
+        </div>
+    </div>
+    <div data-expandable-container="collapsed" data-expandable-override=true data-expandable-callback="exampleCallback">
+        <button data-expandable-trigger">></button>
+        <h2>Expandable Plugin (Custom Callback)</h2>
+        <div data-expandable-target>
+            <p>This is a sample Expandable component. Click the caret icon to trigger expansion or collapse.</p>
+            <p>The expandable container has two states: "expanded" and "collapsed"</p>
+        </div>
+    </div> 
+    <div data-expandable-container="collapsed">
+        <button data-expandable-trigger="mouseover">></button>
+        <h2>Expandable Plugin (Hover)</h2>
+        <div data-expandable-target>
+            <p>This is a sample Expandable component. Click the caret icon to trigger expansion or collapse.</p>
+            <p>The expandable container has two states: "expanded" and "collapsed"</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import {Expandables, initExpandables} from '/expandables-js/expandables.js';
+        initExpandables(); 
+        
+        window.exampleCallback = ( event ) => {
+            let expandableId = event.target.getAttribute( 'data-expandable-id' ); 
+            Expandables.getExpandable( expandableId ).toggle(); 
+            alert( 'Custom callback triggered on ' + expandableId + '; expanded = ' + Expandables.getExpandable( expandableId ).getSettings().expanded );
+        } 
+
+        document.getElementById( 'collapseExpandables' ).addEventListener( 'click', event => {
+            Expandables.collapseAll();
+        });
+
+        document.getElementById( 'expandExpandables' ).addEventListener( 'click', event => {
+            Expandables.expandAll();
+        });
+
+        document.getElementById( 'deleteExpandables' ).addEventListener( 'click', event => {
+            console.log( 'boom' );
+            Expandables.destroyExpandables();
+        });
+    </script>
+</body>
+</html>
